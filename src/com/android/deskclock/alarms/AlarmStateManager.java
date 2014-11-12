@@ -788,6 +788,39 @@ public final class AlarmStateManager extends BroadcastReceiver {
     }
 
     /**
+     * Make the alarm snooze based on the snooze interval in settings.
+     * If the phone is not busy in call anymore, this method will not be
+     * called, and the alarm will wake up based on snooze interval.
+     */
+    private void snooze(Context context, Intent intent, AlarmInstance instance) {
+        Uri uri = intent.getData();
+        AlarmInstance newInstance = AlarmInstance.getInstance(context.getContentResolver(),
+                AlarmInstance.getId(uri));
+        if (newInstance == null) {
+            // If AlarmInstance is turn to null,return.
+            return;
+        }
+
+        // Notify the user that the alarm has been snoozed.
+        Intent cancelSnooze = createStateChangeIntent(context, ALARM_MANAGER_TAG, newInstance,
+                AlarmInstance.DISMISSED_STATE);
+        PendingIntent broadcast = PendingIntent.getBroadcast(context, instance.hashCode(),
+                cancelSnooze, 0);
+        String label = newInstance.getLabelOrDefault(context);
+        label = context.getString(R.string.alarm_notify_snooze_label, label);
+        NotificationManager nm = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification n = new Notification(R.drawable.stat_notify_alarm, label, 0);
+        n.setLatestEventInfo(context, label,
+                context.getString(R.string.alarm_notify_snooze_text,
+                        AlarmUtils.getFormattedTime(context, instance.getAlarmTime())),
+                broadcast);
+        n.flags |= Notification.FLAG_AUTO_CANCEL | Notification.FLAG_ONGOING_EVENT;
+        nm.notify(instance.hashCode(), n);
+        setAlarmState(context, instance, AlarmInstance.SNOOZE_STATE);
+    }
+
+    /**
      * Creates an intent that can be used to set an AlarmManager alarm to set the next alarm
      * indicators.
      */
