@@ -16,6 +16,8 @@
 package com.android.deskclock.alarms;
 
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -27,6 +29,7 @@ import android.net.Uri;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+import android.telephony.TelephonyManager;
 
 import com.android.deskclock.AlarmAlertWakeLock;
 import com.android.deskclock.AlarmClockFragment;
@@ -459,6 +462,31 @@ public final class AlarmStateManager extends BroadcastReceiver {
         final String snoozeMinutesStr = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(SettingsActivity.KEY_ALARM_SNOOZE, DEFAULT_SNOOZE_MINUTES);
         return Integer.parseInt(snoozeMinutesStr);
+    }
+
+    /**
+     * This will set the alarm instance to the one minute late and update
+     * the application notifications and schedule any state changes that need
+     * to occur in the future.
+     *
+     * @param context application context
+     * @param instance to set state to
+     */
+    public static void setOneminutelate(Context context, AlarmInstance instance) {
+        AlarmService.stopAlarm(context, instance);
+        int snoozeMinutes = 1;
+
+        // Set alarm time to next minute.Update alarm state and new alarm time in db.
+        Calendar newAlarmTime = Calendar.getInstance();
+        newAlarmTime.add(Calendar.MINUTE, snoozeMinutes);
+        instance.setAlarmTime(newAlarmTime);
+        instance.mAlarmState = AlarmInstance.SNOOZE_STATE;
+        AlarmInstance.updateInstance(context.getContentResolver(), instance);
+        scheduleInstanceStateChange(context, instance.getAlarmTime(),
+                instance, AlarmInstance.FIRED_STATE);
+
+        // Instance time changed, so find next alarm that will fire and notify system
+        updateNextAlarm(context);
     }
 
     /**
