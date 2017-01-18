@@ -20,13 +20,8 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- Setting title for the flip action setting. -->
-  <string name="flip_action_title">フリップアクション</string>
-  <string name="flip_action_dialog_title">フリップアクション</string>
   <!-- Setting title for the shake action setting. -->
-  <string name="shake_action_title">シェイクアクション</string>
-  <string name="shake_action_dialog_title">シェイクアクション</string>
   <!-- Setting labels on Set alarm screen: Increasing volume on or off -->
-  <string name="snooze_count_title">許可されているスヌーズ時間</string>
-  <string name="entry_zero_count">無制限</string>
   <!-- User-defined cities -->
+  <string name="timer_alarm_custom_summary"></string>
 </resources>
