@@ -23,5 +23,4 @@
   <!-- Setting title for the shake action setting. -->
   <!-- Setting labels on Set alarm screen: Increasing volume on or off -->
   <!-- User-defined cities -->
-  <string name="timer_alarm_custom_summary"></string>
 </resources>
